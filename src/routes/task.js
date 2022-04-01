@@ -42,12 +42,18 @@ router.get('/tasks/:id', (req,res)=>{
 
 //Update Task
 router.patch('/tasks/:id', async(req, res)=>{
+    const updates = Object.keys(req.body);
 try{
-    const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true});
-    if(!task){
+    const user = await Task.findById(req.params.id);
+    updates.forEach((update)=>{
+        user[update] = req.body[update];
+    });
+    await user.save();
+    // const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true});
+    if(!user){
         return res.status(404).send();
     }
-    res.send(task);
+    res.send(user);
 } catch(err){
     res.status(400).send(err);
 }
